@@ -1,34 +1,23 @@
-CC=gcc
-FLAGS= -Wall -g
+CC = gcc
+FLAGS = -Wall -g
 
-all:mymaths mymathd mains maind 
+all:myBanks RunBank
 
-mymaths:libmyMath.a
+myBanks:libmyBank.a
 
-mymathd:libmyMath.so
+libmyBank.a:myBank.o myBank.h
+	ar rcs libmyBank.a myBank.o myBank.h
 
-libmyMath.a:power.o basicMath.o myMath.h
-	 ar rcs libmyMath.a power.o basicMath.o myMath.h
+myBank.o:myBank.c myBank.h
+	$(CC) $(FLAGS) -fPIC -c myBank.c
 
-libmyMath.so:power.o basicMath.o	myMath.h
-	$(CC) -shared -o libmyMath.so -fPIC power.o basicMath.o myMath.h
+main.o:main.c myBank.h
+	$(CC) $(FLAGS) -c main.c
 
-basicMath.o: basicMath.c myMath.h 
-	$(CC) -c basicMath.c
+RunBank:main.o libmyBank.a
+	$(CC) $(FLAGS) -o RunBank main.o libmyBank.a 
 
-power.o: power.c myMath.h 
-	$(CC) -c power.c
-
-mains:main.o libmyMath.a
-	$(CC) $(FLAGS) -o  mains main.o libmyMath.a 
-
-maind:main.o libmyMath.so
-	$(CC) $(FLAGS) -o maind main.o ./libmyMath.so 
-
-main.o:main.c myMath.h
-	$(CC) -c main.c
-
-.PHONY:clean 
+.PHONY:clean all
 
 clean:
-	rm -f *.o *.a *.so mains maind
+	rm -f *.o *.a *.so RunBank
